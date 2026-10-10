@@ -3,6 +3,13 @@ package dev.navery.rpgcam;
 /** Coordinate and response calculations shared by the camera and movement controller. */
 public final class CameraMath {
     private CameraMath() {}
+    public static float[] lookAt(double x, double y, double z) {
+        return new float[] {(float)Math.toDegrees(Math.atan2(-x, z)),
+            (float)-Math.toDegrees(Math.atan2(y, Math.hypot(x, z)))};
+    }
+    public static boolean withinReach(double distanceSquared, double min, double max) {
+        return distanceSquared >= min * min && distanceSquared <= max * max;
+    }
     public static double frameResponse(double multiplier, double seconds) {
         return 1 - Math.pow(1 - multiplier, seconds * 60);
     }

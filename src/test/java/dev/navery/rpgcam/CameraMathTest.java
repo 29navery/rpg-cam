@@ -39,4 +39,30 @@ class CameraMathTest {
         assertTrue(CameraMath.turnResponse(10)<1);
         assertEquals(1,CameraMath.frameResponse(1,1.0/60));
     }
+    @Test void cursorFacingConvergesOnTargetDespiteShoulderOffset() {
+        // Camera at (+0.5, +0.2, -4), looking forward; the target is at (+0.5, +0.2, +3).
+        // The character at the origin must compensate for parallax, rather than blindly copying yaw=0.
+        double x = .5, y = .2, z = 3;
+        float[] look = CameraMath.lookAt(x, y, z);
+        double yaw = Math.toRadians(look[0]), pitch = Math.toRadians(look[1]);
+        double length = Math.sqrt(x*x + y*y + z*z);
+        assertEquals(x/length,-Math.sin(yaw)*Math.cos(pitch),1e-6);
+        assertEquals(y/length,-Math.sin(pitch),1e-6);
+        assertEquals(z/length,Math.cos(yaw)*Math.cos(pitch),1e-6);
+        assertTrue(look[0]<0);
+        assertTrue(look[1]<0);
+    }
+    @Test void lookingStraightUpOrDownKeepsValidPitch() {
+        assertEquals(-90,CameraMath.lookAt(0,10,0)[1]);
+        assertEquals(90,CameraMath.lookAt(0,-10,0)[1]);
+        assertEquals(-90,CameraMath.lookAt(1,0,0)[0]);
+        assertEquals(90,CameraMath.lookAt(-1,0,0)[0]);
+    }
+    @Test void cameraDistanceDoesNotGrantAdditionalInteractionReach() {
+        assertTrue(CameraMath.withinReach(4*4,0,4.5));
+        assertFalse(CameraMath.withinReach(5*5,0,4.5));
+        assertFalse(CameraMath.withinReach(1*1,2,4.5));
+        assertTrue(CameraMath.withinReach(2*2,2,4.5));
+    }
+
 }

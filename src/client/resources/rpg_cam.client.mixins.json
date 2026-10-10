@@ -6,7 +6,10 @@
     "EntityMixin",
     "LocalPlayerMixin",
     "CameraMixin",
-    "LivingEntityMixin"
+    "LivingEntityMixin",
+    "HudMixin",
+    "MinecraftMixin",
+    "GameModeMixin"
   ],
   "injectors": {
     "defaultRequire": 1

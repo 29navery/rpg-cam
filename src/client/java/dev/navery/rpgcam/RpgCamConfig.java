@@ -12,9 +12,9 @@ public final class RpgCamConfig {
     private static final Path FILE = FabricLoader.getInstance().getConfigDir().resolve("rpg-cam.json");
     public boolean enabled = true;
     public double smoothingMultiplier = 0.5;
-    public double playerTurnSpeed = 5.0;
-    public double cameraYOffset = 0.0;
-    public double cameraXOffset = 0.0;
+    public double playerTurnSpeed = 3.5;
+    public double cameraYOffset = 0.2;
+    public double cameraXOffset = 0.5;
 
     public static RpgCamConfig load() {
         try {
@@ -27,9 +27,9 @@ public final class RpgCamConfig {
     }
     public void validate() {
         smoothingMultiplier = clamp(smoothingMultiplier, 0.1, 1, 0.5);
-        playerTurnSpeed = clamp(playerTurnSpeed, 0, 10, 5);
-        cameraYOffset = Math.round(clamp(cameraYOffset, 0, 2, 0) * 10) / 10.0;
-        cameraXOffset = Math.round(clamp(cameraXOffset, -1, 1, 0) * 10) / 10.0;
+        playerTurnSpeed = clamp(playerTurnSpeed, 0, 10, 3.5);
+        cameraYOffset = Math.round(clamp(cameraYOffset, 0, 2, 0.2) * 10) / 10.0;
+        cameraXOffset = Math.round(clamp(cameraXOffset, -1, 1, 0.5) * 10) / 10.0;
     }
     private static double clamp(double v, double min, double max, double fallback) {
         return Double.isFinite(v) ? Math.max(min, Math.min(max, v)) : fallback;

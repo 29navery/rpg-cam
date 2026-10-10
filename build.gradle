@@ -24,6 +24,7 @@ loom {
 }
 
 dependencies {
+	testImplementation sourceSets.client.output
 	testImplementation "org.junit.jupiter:junit-jupiter:5.14.0"
 	testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 	// To change the versions see the gradle.properties file

@@ -10,6 +10,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.component.SwingAnimation;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin {
@@ -30,4 +33,10 @@ public abstract class LivingEntityMixin {
         }
         return entity.getYRot();
     }
+    @Inject(method = "swing", at = @At("HEAD"))
+    private void rpgcam$aimBeforeSwing(InteractionHand hand, SwingAnimation animation, boolean broadcast,
+        CallbackInfoReturnable<Boolean> ci) {
+        if ((Object)this == Minecraft.getInstance().player) RpgCamClient.faceCursor(true);
+    }
+
 }

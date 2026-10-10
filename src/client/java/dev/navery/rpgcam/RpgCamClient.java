@@ -13,6 +13,9 @@ public final class RpgCamClient implements ClientModInitializer {
     private static boolean initialized;
     private static float targetYaw, targetPitch, yaw, pitch;
     private static long lastFrame;
+    private static int aimUntilTick;
+    private static int lastAimSendTick = -1;
+    private static float lastAimSendYaw, lastAimSendPitch;
 
     @Override public void onInitializeClient() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -29,17 +32,25 @@ public final class RpgCamClient implements ClientModInitializer {
         LocalPlayer player = Minecraft.getInstance().player;
         if (!initialized || trackedPlayer != player) {
             trackedPlayer = player;
+            aimUntilTick = 0;
+            lastAimSendTick = -1;
             targetYaw = yaw = player.getYRot();
             targetPitch = pitch = player.getXRot();
             lastFrame = System.nanoTime();
             initialized = true;
         }
     }
-    public static void reset() { initialized = false; trackedPlayer = null; }
+    public static void reset() {
+        initialized = false; trackedPlayer = null; aimUntilTick = 0; lastAimSendTick = -1;
+    }
     public static void orbit(double dx, double dy) {
         initialize();
         targetYaw = yaw + Mth.wrapDegrees((float)(targetYaw - yaw + dx * 0.15));
         targetPitch = Mth.clamp((float)(targetPitch + dy * 0.15), -90, 90);
+        LocalPlayer player = Minecraft.getInstance().player;
+        float previous = player.getXRot();
+        player.setXRot(targetPitch);
+        player.xRotO += player.getXRot() - previous;
     }
     public static void updateCamera() {
         initialize();
@@ -62,12 +73,16 @@ public final class RpgCamClient implements ClientModInitializer {
         return CameraMath.movementYaw(yaw(), left, forward);
     }
     public static void applyMovement(LocalPlayer player) {
+        initialize();
         float left = player.xxa, forward = player.zza;
+        boolean aiming = player.tickCount < aimUntilTick || player.isUsingItem() || player.isSwinging()
+            || Minecraft.getInstance().gameMode.isDestroying();
+        if (aiming) alignWithCursor(player);
+        else player.setXRot(targetPitch);
         if (left * left + forward * forward < 1.0e-6f) return;
         float wanted = movementYaw(left, forward);
         float amount = (float)(CameraMath.turnResponse(CONFIG.playerTurnSpeed));
-        player.setYRot(player.getYRot() + Mth.wrapDegrees(wanted - player.getYRot()) * amount);
-        player.setXRot(0);
+        if (!aiming) player.setYRot(player.getYRot() + Mth.wrapDegrees(wanted - player.getYRot()) * amount);
         player.yHeadRot = player.getYRot();
         player.yBodyRot = player.getYRot();
         // Compensate for body turn lag so movement always uses the camera's basis.
@@ -75,4 +90,34 @@ public final class RpgCamClient implements ClientModInitializer {
         player.xxa = movement[0];
         player.zza = movement[1];
     }
+    private static void alignWithCursor(LocalPlayer player) {
+        Minecraft mc = Minecraft.getInstance();
+        // Refresh targeting too, so the action and the character's facing share one aim point.
+        mc.hitResult = CameraAim.pick(player, 1.0f);
+        mc.crosshairPickEntity = mc.hitResult instanceof net.minecraft.world.phys.EntityHitResult hit ? hit.getEntity() : null;
+        net.minecraft.world.phys.Vec3 direction = CameraAim.aimPoint().subtract(player.getEyePosition());
+        if (direction.lengthSqr() < 1.0e-8) return;
+        float[] look = CameraMath.lookAt(direction.x, direction.y, direction.z);
+        player.setYRot(look[0]);
+        player.setXRot(look[1]);
+        player.yHeadRot = player.getYRot();
+        player.yBodyRot = player.getYRot();
+    }
+    public static void faceCursor(boolean sendRotation) {
+        if (!active()) return;
+        initialize();
+        LocalPlayer player = Minecraft.getInstance().player;
+        aimUntilTick = player.tickCount + 6;
+        alignWithCursor(player);
+        if (sendRotation && (lastAimSendTick != player.tickCount
+            || lastAimSendYaw != player.getYRot() || lastAimSendPitch != player.getXRot())) {
+            // A vanilla rotation packet precedes the vanilla action packet; no server mod is involved.
+            player.connection.send(new net.minecraft.network.protocol.game.ServerboundMovePlayerPacket.Rot(
+                player.getYRot(), player.getXRot(), player.onGround(), player.horizontalCollision));
+            lastAimSendTick = player.tickCount;
+            lastAimSendYaw = player.getYRot();
+            lastAimSendPitch = player.getXRot();
+        }
+    }
+
 }
