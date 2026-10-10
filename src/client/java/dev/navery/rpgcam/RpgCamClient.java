@@ -11,7 +11,7 @@ public final class RpgCamClient implements ClientModInitializer {
     public static final RpgCamConfig CONFIG = RpgCamConfig.load();
     private static LocalPlayer trackedPlayer;
     private static boolean initialized;
-    private static float targetYaw, targetPitch, yaw, pitch;
+    private static float targetYaw, targetPitch, yaw, pitch, visualYaw, visualYawOld;
     private static long lastFrame;
     private static int aimUntilTick;
     private static int lastAimSendTick = -1;
@@ -35,6 +35,7 @@ public final class RpgCamClient implements ClientModInitializer {
             aimUntilTick = 0;
             lastAimSendTick = -1;
             targetYaw = yaw = player.getYRot();
+            visualYaw = visualYawOld = player.yBodyRot;
             targetPitch = pitch = player.getXRot();
             lastFrame = System.nanoTime();
             initialized = true;
@@ -72,19 +73,42 @@ public final class RpgCamClient implements ClientModInitializer {
     public static float movementYaw(float left, float forward) {
         return CameraMath.movementYaw(yaw(), left, forward);
     }
+
+    public static boolean aiming() {
+        LocalPlayer player = Minecraft.getInstance().player;
+        return player != null && (player.tickCount < aimUntilTick || player.isUsingItem() || player.isSwinging()
+            || Minecraft.getInstance().gameMode.isDestroying());
+    }
+    public static boolean omnidirectionalSprintAllowed() {
+        return active() && !aiming() && !Minecraft.getInstance().player.isSwimming();
+    }
+    public static float visualYaw(float partialTick) {
+        initialize();
+        return Mth.rotLerp(partialTick, visualYawOld, visualYaw);
+    }
+    public static void keepBodyFacing(LocalPlayer player) {
+        player.yHeadRot = player.getYRot();
+        player.yBodyRot = player.getYRot();
+    }
     public static void applyMovement(LocalPlayer player) {
         initialize();
         float left = player.xxa, forward = player.zza;
-        boolean aiming = player.tickCount < aimUntilTick || player.isUsingItem() || player.isSwinging()
-            || Minecraft.getInstance().gameMode.isDestroying();
-        if (aiming) alignWithCursor(player);
-        else player.setXRot(targetPitch);
-        if (left * left + forward * forward < 1.0e-6f) return;
-        float wanted = movementYaw(left, forward);
-        float amount = (float)(CameraMath.turnResponse(CONFIG.playerTurnSpeed));
-        if (!aiming) player.setYRot(player.getYRot() + Mth.wrapDegrees(wanted - player.getYRot()) * amount);
-        player.yHeadRot = player.getYRot();
-        player.yBodyRot = player.getYRot();
+        boolean aiming = aiming();
+        boolean moving = CameraMath.hasMovement(left, forward);
+        float wanted;
+        if (aiming) {
+            alignWithCursor(player);
+            wanted = player.getYRot();
+        } else {
+            player.setXRot(targetPitch);
+            wanted = moving ? movementYaw(left, forward) : player.getYRot();
+        }
+        // Advance the visible body/head exactly once per simulation tick. Action hooks only set the aim.
+        visualYawOld = visualYaw;
+        visualYaw = CameraMath.turnTowards(visualYaw, wanted, CONFIG.playerTurnSpeed);
+        if (!aiming && moving) player.setYRot(visualYaw);
+        keepBodyFacing(player);
+        if (!moving) return;
         // Compensate for body turn lag so movement always uses the camera's basis.
         float[] movement = CameraMath.movementInBodySpace(yaw(), player.getYRot(), left, forward);
         player.xxa = movement[0];
@@ -100,8 +124,7 @@ public final class RpgCamClient implements ClientModInitializer {
         float[] look = CameraMath.lookAt(direction.x, direction.y, direction.z);
         player.setYRot(look[0]);
         player.setXRot(look[1]);
-        player.yHeadRot = player.getYRot();
-        player.yBodyRot = player.getYRot();
+        keepBodyFacing(player);
     }
     public static void faceCursor(boolean sendRotation) {
         if (!active()) return;

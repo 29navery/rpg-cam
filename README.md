@@ -4,7 +4,9 @@ A client-side Fabric mod for Minecraft 26.3 with a third-person swivel camera.
 
 ## How it works
 
-Press **F5** to switch to third-person rear view. Move the mouse to orbit the camera freely. WASD moves relative to the camera, and your character turns toward the movement direction instead of following the mouse. Turning the camera while standing still keeps your character's horizontal facing unchanged. Looking up and down still tilts your character's head.
+Press **F5** to switch to third-person rear view. Move the mouse to orbit the camera freely. WASD moves relative to the camera, and your character turns toward the movement direction instead of following the mouse. Hold your sprint key to sprint forward, backward, sideways, or diagonally while roaming in rear third-person view. Directional double-tap sprinting also works. Minecraft's normal hunger, crouching, item-use, water, and collision restrictions still apply.
+
+Turning the camera while standing still keeps your character's horizontal facing unchanged. Looking up and down still tilts your character's head.
 
 First-person and front-facing third-person use Minecraft's normal controls. The swivel camera also pauses while riding, sleeping, or flying with elytra, and resumes when returning to ordinary movement. Movement retains Minecraft's normal sneak/item-use speed reductions. Sprint-jump momentum follows the movement direction even while the character is still turning.
 
@@ -22,7 +24,7 @@ Install **Mod Menu 21.0.0** for Minecraft 26.3, then open **Mods → RPG Cam →
 
 Settings save immediately. Camera rotation smoothing is independent of frame rate. Camera distance still uses Minecraft's collision checks, and the pivot offsets are clipped against obstacles.
 
-The crosshair appears in rear third-person view and targets along the rendered camera's center ray, including camera offsets. Attacking, swinging, mining, and interacting turn your character toward the cursor before performing the action. Facing stays aligned while swinging or using an item, including when releasing a bow. Movement remains camera-relative during these actions.
+The crosshair appears in rear third-person view and targets along the rendered camera's center ray, including camera offsets. Attacking, swinging, mining, and interacting smoothly turn your character toward the cursor using Player Turn Speed. The visible character eases toward the aim while swinging or using an item, including when releasing a bow. Tool and projectile aiming still uses the exact cursor direction while the visible turn catches up. Movement remains camera-relative during these actions.
 
 Targeting retains normal player interaction reach and checks that the player can see the target, so camera offsets do not grant extra reach or interactions through walls. All code and hooks run only on the client; multiplayer actions use Minecraft's existing packets.
 

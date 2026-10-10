@@ -65,4 +65,22 @@ class CameraMathTest {
         assertTrue(CameraMath.withinReach(2*2,2,4.5));
     }
 
+    @Test void allRoamingDirectionsCanQualifyForSprintButIdleCannot() {
+        for (float[] input : new float[][]{{0,1},{0,-1},{1,0},{-1,0},{1,1},{-1,-1}}) {
+            assertTrue(CameraMath.hasMovement(input[0],input[1]));
+        }
+        assertFalse(CameraMath.hasMovement(0,0));
+    }
+    @Test void interactionTurnUsesSpeedAndShortestPathWithoutSnapping() {
+        float slow = CameraMath.turnTowards(0,90,3.5);
+        float fast = CameraMath.turnTowards(0,90,10);
+        assertTrue(slow>0 && slow<fast && fast<90);
+        assertEquals(42,CameraMath.turnTowards(42,150,0));
+        float acrossBoundary = CameraMath.turnTowards(179,-179,3.5);
+        assertTrue(acrossBoundary>179 && acrossBoundary<181);
+        float facing = 0;
+        for(int i=0;i<120;i++) facing=CameraMath.turnTowards(facing,90,3.5);
+        assertEquals(90,facing,1e-4);
+    }
+
 }

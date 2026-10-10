@@ -3,6 +3,15 @@ package dev.navery.rpgcam;
 /** Coordinate and response calculations shared by the camera and movement controller. */
 public final class CameraMath {
     private CameraMath() {}
+    public static boolean hasMovement(float left, float forward) {
+        return left * left + forward * forward > 1.0e-6f;
+    }
+    public static float turnTowards(float current, float wanted, double speed) {
+        float difference = (wanted - current) % 360;
+        if (difference >= 180) difference -= 360;
+        if (difference < -180) difference += 360;
+        return current + difference * (float)turnResponse(speed);
+    }
     public static float[] lookAt(double x, double y, double z) {
         return new float[] {(float)Math.toDegrees(Math.atan2(-x, z)),
             (float)-Math.toDegrees(Math.atan2(y, Math.hypot(x, z)))};

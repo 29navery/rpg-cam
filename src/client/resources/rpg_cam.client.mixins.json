@@ -9,7 +9,8 @@
     "LivingEntityMixin",
     "HudMixin",
     "MinecraftMixin",
-    "GameModeMixin"
+    "GameModeMixin",
+    "LivingEntityRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

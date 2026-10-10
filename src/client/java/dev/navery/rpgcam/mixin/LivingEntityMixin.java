@@ -20,8 +20,7 @@ public abstract class LivingEntityMixin {
     private void rpgcam$keepBodyFacing(float wantedYaw, CallbackInfo ci) {
         if ((Object)this == Minecraft.getInstance().player && RpgCamClient.active()) {
             LocalPlayer player = Minecraft.getInstance().player;
-            player.yBodyRot = player.getYRot();
-            player.yHeadRot = player.getYRot();
+            RpgCamClient.keepBodyFacing(player);
             ci.cancel();
         }
     }
