@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "dev.navery.rpgcam.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "EntityMixin",
+    "LocalPlayerMixin",
+    "CameraMixin",
+    "LivingEntityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
