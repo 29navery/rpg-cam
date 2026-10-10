@@ -1,5 +1,7 @@
 package dev.navery.rpgcam;
 
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.gui.screens.Screen;
@@ -7,6 +9,7 @@ import net.minecraft.client.gui.screens.options.OptionsSubScreen;
 import net.minecraft.network.chat.Component;
 import java.util.Locale;
 import java.util.function.IntConsumer;
+import java.util.function.Consumer;
 
 public final class RpgCamOptionsScreen extends OptionsSubScreen {
     public RpgCamOptionsScreen(Screen parent) {
@@ -16,7 +19,7 @@ public final class RpgCamOptionsScreen extends OptionsSubScreen {
     protected void addOptions() {
         RpgCamConfig c = RpgCamClient.CONFIG;
         if (list == null) return;
-        list.addBig(OptionInstance.createBoolean("rpg_cam.enabled", c.enabled, value -> {
+        list.addBig(toggle("rpg_cam.enabled", c.enabled, value -> {
             c.enabled = value; c.save();
         }));
         list.addSmall(
@@ -25,6 +28,15 @@ public final class RpgCamOptionsScreen extends OptionsSubScreen {
         list.addSmall(
             slider("rpg_cam.x_offset", -10, 10, (int)Math.round(c.cameraXOffset * 10), value -> c.cameraXOffset = value / 10.0),
             slider("rpg_cam.y_offset", 0, 20, (int)Math.round(c.cameraYOffset * 10), value -> c.cameraYOffset = value / 10.0));
+        list.addBig(toggle("rpg_cam.direction", c.direction, value -> {
+            c.direction = value; c.save();
+        }));
+    }
+    private OptionInstance<Boolean> toggle(String key, boolean initial, Consumer<Boolean> setter) {
+        return OptionInstance.createBoolean(key, OptionInstance.noTooltip(),
+            (caption, value) -> (value ? CommonComponents.OPTION_ON : CommonComponents.OPTION_OFF)
+                .copy().withStyle(value ? ChatFormatting.GREEN : ChatFormatting.RED),
+            initial, setter::accept);
     }
     private OptionInstance<Integer> slider(String key, int min, int max, int initial, IntConsumer setter) {
         return new OptionInstance<>(key, OptionInstance.noTooltip(),

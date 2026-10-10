@@ -13,8 +13,8 @@ public abstract class MinecraftMixin {
     private void rpgcam$aimBeforeAttack(CallbackInfoReturnable<Boolean> ci) { RpgCamClient.faceCursor(true); }
     @Inject(method = "continueAttack", at = @At("HEAD"))
     private void rpgcam$aimWhileMining(boolean down, CallbackInfo ci) {
-        if (down) RpgCamClient.faceCursor(true);
+        if (down) RpgCamClient.faceCursorIfTarget();
     }
     @Inject(method = "startUseItem", at = @At("HEAD"))
-    private void rpgcam$aimBeforeInteraction(CallbackInfo ci) { RpgCamClient.faceCursor(true); }
+    private void rpgcam$aimBeforeInteraction(CallbackInfo ci) { RpgCamClient.faceCursorIfTarget(); }
 }

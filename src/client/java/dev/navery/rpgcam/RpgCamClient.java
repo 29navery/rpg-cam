@@ -101,12 +101,12 @@ public final class RpgCamClient implements ClientModInitializer {
             wanted = player.getYRot();
         } else {
             player.setXRot(targetPitch);
-            wanted = moving ? movementYaw(left, forward) : player.getYRot();
+            wanted = CONFIG.direction ? yaw() : moving ? movementYaw(left, forward) : player.getYRot();
         }
         // Advance the visible body/head exactly once per simulation tick. Action hooks only set the aim.
         visualYawOld = visualYaw;
         visualYaw = CameraMath.turnTowards(visualYaw, wanted, CONFIG.playerTurnSpeed);
-        if (!aiming && moving) player.setYRot(visualYaw);
+        if (!aiming && (moving || CONFIG.direction)) player.setYRot(visualYaw);
         keepBodyFacing(player);
         if (!moving) return;
         // Compensate for body turn lag so movement always uses the camera's basis.
@@ -125,6 +125,20 @@ public final class RpgCamClient implements ClientModInitializer {
         player.setYRot(look[0]);
         player.setXRot(look[1]);
         keepBodyFacing(player);
+    }
+    public static void faceCursorIfTarget() {
+        if (!active()) return;
+        Minecraft mc = Minecraft.getInstance();
+        LocalPlayer player = mc.player;
+        // CameraAim applies player reach and visibility, so distant/obstructed objects count as misses.
+        mc.hitResult = CameraAim.pick(player, 1.0f);
+        mc.crosshairPickEntity = mc.hitResult instanceof net.minecraft.world.phys.EntityHitResult hit ? hit.getEntity() : null;
+        if (mc.hitResult.getType() != net.minecraft.world.phys.HitResult.Type.MISS) {
+            faceCursor(true);
+        }
+    }
+    public static void prepareItemAim() {
+        if (active()) { initialize(); alignWithCursor(Minecraft.getInstance().player); }
     }
     public static void faceCursor(boolean sendRotation) {
         if (!active()) return;
