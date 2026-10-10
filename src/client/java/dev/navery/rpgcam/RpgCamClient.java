@@ -38,11 +38,15 @@ public final class RpgCamClient implements ClientModInitializer {
     }
     public static boolean sleepingView() {
         Minecraft mc = Minecraft.getInstance();
-        return CONFIG.enabled && mc.player != null && mc.getCameraEntity() == mc.player && mc.player.isSleeping();
+        return CONFIG.enabled && !mc.gameRenderer.mainCamera().isPanoramicMode()
+            && mc.player != null && mc.getCameraEntity() == mc.player && mc.player.isSleeping();
     }
     public static boolean active() {
         Minecraft mc = Minecraft.getInstance();
-        return CONFIG.enabled && mc.player != null && mc.getCameraEntity() == mc.player
+        // Panorama capture owns the camera for all six faces. Yield every RPG Cam hook,
+        // including the sleeping view, without changing settings or losing the orbit state.
+        return CONFIG.enabled && !mc.gameRenderer.mainCamera().isPanoramicMode()
+            && mc.player != null && mc.getCameraEntity() == mc.player
             && mc.options.getCameraType() == CameraType.THIRD_PERSON_BACK
             && !mc.player.isSleeping() && !mc.player.isPassenger() && !mc.player.isFallFlying();
     }

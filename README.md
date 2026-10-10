@@ -12,6 +12,8 @@ First-person and front-facing third-person use Minecraft's normal controls. Whil
 
 The swivel camera also pauses while riding or flying with elytra, and resumes when returning to ordinary movement. Movement retains Minecraft's normal sneak/item-use speed reductions. Sprint-jump momentum follows the movement direction even while the character is still turning.
 
+During Minecraft's panorama capture (`takePanorama`), RPG Cam yields camera, targeting, and player-rendering control so each panorama face uses the capture's requested rotation. This also applies to mods using the camera's panoramic mode, including while sleeping. Normal RPG Cam behavior resumes when panoramic mode ends.
+
 ## Settings
 
 Install **Mod Menu 21.0.0** for Minecraft 26.3, then open **Mods → RPG Cam → Configure**. You can also bind **Open RPG Cam Settings** under **Options → Controls → Key Binds → RPG Cam** to open settings directly while playing, even with the mod disabled. It is unbound by default and works without Mod Menu. Mod Menu is optional; without a binding or Mod Menu, edit `config/rpg-cam.json` while Minecraft is closed.
