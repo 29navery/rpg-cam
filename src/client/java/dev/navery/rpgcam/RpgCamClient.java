@@ -36,6 +36,10 @@ public final class RpgCamClient implements ClientModInitializer {
             }
         });
     }
+    public static boolean sleepingView() {
+        Minecraft mc = Minecraft.getInstance();
+        return CONFIG.enabled && mc.player != null && mc.getCameraEntity() == mc.player && mc.player.isSleeping();
+    }
     public static boolean active() {
         Minecraft mc = Minecraft.getInstance();
         return CONFIG.enabled && mc.player != null && mc.getCameraEntity() == mc.player

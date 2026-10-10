@@ -8,7 +8,9 @@ Press **F5** to switch to third-person rear view. Move the mouse to orbit the ca
 
 Turning the camera while standing still keeps your character's horizontal facing unchanged. In Head Pitch: Camera mode, the head smoothly follows camera yaw and pitch with a ±75° horizontal limit while the body keeps its movement-facing rotation. Directional mode smoothly tilts the head with vertical velocity and keeps its horizontal facing aligned with the body. Head smoothing uses Smoothing Multiplier. Head yaw uses a critically damped spring that accelerates into a turn and eases to rest, including at smoothing 1.0.
 
-First-person and front-facing third-person use Minecraft's normal controls. The swivel camera also pauses while riding, sleeping, or flying with elytra, and resumes when returning to ordinary movement. Movement retains Minecraft's normal sneak/item-use speed reductions. Sprint-jump momentum follows the movement direction even while the character is still turning.
+First-person and front-facing third-person use Minecraft's normal controls. While sleeping with the mod enabled, a detached overhead camera shows the entire player, regardless of the selected perspective. It centers on the bed, raycasts up to five blocks above it, and glides to the reachable distance (with a small ceiling clearance). That reachable distance is the final zoom target, so the transition completes even under a low ceiling. Waking restores the selected perspective.
+
+The swivel camera also pauses while riding or flying with elytra, and resumes when returning to ordinary movement. Movement retains Minecraft's normal sneak/item-use speed reductions. Sprint-jump momentum follows the movement direction even while the character is still turning.
 
 ## Settings
 

@@ -127,6 +127,19 @@ class CameraMathTest {
         assertEquals(90, CameraMath.smoothAngle(0, 90, 1, 1.0 / 60));
         assertEquals(0, CameraMath.smoothAngle(0, 90, .5, 0));
     }
+    @Test void sleepingCameraUsesTheReachableDestinationInsteadOfAnUnreachableFiveBlocks() {
+        assertEquals(5, CameraMath.sleepDistanceTarget(5));
+        assertEquals(2.2f, CameraMath.sleepDistanceTarget(2.3f), 1e-6);
+        assertEquals(0, CameraMath.sleepDistanceTarget(.05f));
+        float target = CameraMath.sleepDistanceTarget(2.3f), distance = .15f;
+        for (int i = 0; i < 120; i++) {
+            float previous = distance;
+            distance = CameraMath.glideDistance(distance, target, target, 1.0 / 60);
+            assertTrue(distance >= previous && distance <= target);
+        }
+        assertEquals(target, distance, 1e-5);
+        assertEquals(.9f, CameraMath.glideDistance(5, .9f, .9f, 1.0 / 60), 1e-6);
+    }
     @Test void distanceGlidesBothWaysButNeverClipsThroughAnObstruction() {
         float outward = CameraMath.glideDistance(2, 15, 15, 1.0 / 60);
         assertTrue(outward > 2 && outward < 15);
