@@ -19,10 +19,12 @@ public final class RpgCamOptionsScreen extends OptionsSubScreen {
         list.addBig(OptionInstance.createBoolean("rpg_cam.enabled", c.enabled, value -> {
             c.enabled = value; c.save();
         }));
-        list.addBig(slider("rpg_cam.smoothing", 1, 10, (int)Math.round(c.smoothingMultiplier * 10), value -> c.smoothingMultiplier = value / 10.0));
-        list.addBig(slider("rpg_cam.turn_speed", 0, 100, (int)Math.round(c.playerTurnSpeed * 10), value -> c.playerTurnSpeed = value / 10.0));
-        list.addBig(slider("rpg_cam.y_offset", 0, 20, (int)Math.round(c.cameraYOffset * 10), value -> c.cameraYOffset = value / 10.0));
-        list.addBig(slider("rpg_cam.x_offset", -10, 10, (int)Math.round(c.cameraXOffset * 10), value -> c.cameraXOffset = value / 10.0));
+        list.addSmall(
+            slider("rpg_cam.smoothing", 1, 10, (int)Math.round(c.smoothingMultiplier * 10), value -> c.smoothingMultiplier = value / 10.0),
+            slider("rpg_cam.turn_speed", 0, 100, (int)Math.round(c.playerTurnSpeed * 10), value -> c.playerTurnSpeed = value / 10.0));
+        list.addSmall(
+            slider("rpg_cam.x_offset", -10, 10, (int)Math.round(c.cameraXOffset * 10), value -> c.cameraXOffset = value / 10.0),
+            slider("rpg_cam.y_offset", 0, 20, (int)Math.round(c.cameraYOffset * 10), value -> c.cameraYOffset = value / 10.0));
     }
     private OptionInstance<Integer> slider(String key, int min, int max, int initial, IntConsumer setter) {
         return new OptionInstance<>(key, OptionInstance.noTooltip(),
