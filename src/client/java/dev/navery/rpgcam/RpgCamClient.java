@@ -2,6 +2,10 @@ package dev.navery.rpgcam;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.resources.Identifier;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -12,6 +16,8 @@ public final class RpgCamClient implements ClientModInitializer {
     private static LocalPlayer trackedPlayer;
     private static boolean initialized;
     private static float targetYaw, targetPitch, yaw, pitch, visualYaw, visualYawOld;
+    private static float visualHeadYaw, visualHeadPitch;
+    private static KeyMapping openSettings;
     private static long lastFrame, lastDistanceFrame;
     private static boolean distanceInitialized;
     private static float distance;
@@ -20,8 +26,14 @@ public final class RpgCamClient implements ClientModInitializer {
     private static float lastAimSendYaw, lastAimSendPitch;
 
     @Override public void onInitializeClient() {
+        KeyMapping.Category category = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("rpg_cam", "settings"));
+        openSettings = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.rpg_cam.open_settings",
+            InputConstants.Type.KEYBOARD, InputConstants.UNKNOWN.getValue(), category));
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (!active()) reset();
+            while (openSettings.consumeClick()) {
+                if (client.gui.screen() == null && client.player != null) client.gui.setScreen(new RpgCamOptionsScreen(null));
+            }
         });
     }
     public static boolean active() {
@@ -40,6 +52,8 @@ public final class RpgCamClient implements ClientModInitializer {
             targetYaw = yaw = player.getYRot();
             visualYaw = visualYawOld = player.yBodyRot;
             targetPitch = pitch = player.getXRot();
+            visualHeadYaw = player.yHeadRot;
+            visualHeadPitch = player.getXRot();
             lastFrame = System.nanoTime();
             initialized = true;
         }
@@ -71,6 +85,12 @@ public final class RpgCamClient implements ClientModInitializer {
         float wrapped = Mth.wrapDegrees(yaw);
         targetYaw += wrapped - yaw;
         yaw = wrapped;
+        // Smooth visible head motion once per camera frame, independently of exact action rotation.
+        float headYawTarget = CONFIG.directionalHeadPitch ? visualYaw : yaw;
+        float headPitchTarget = CONFIG.directionalHeadPitch
+            ? CameraMath.directionalHeadPitch(trackedPlayer.getDeltaMovement().y, trackedPlayer.onGround()) : pitch;
+        visualHeadYaw = CameraMath.smoothAngle(visualHeadYaw, headYawTarget, CONFIG.smoothingMultiplier, elapsed);
+        visualHeadPitch += (float)((headPitchTarget - visualHeadPitch) * alpha);
     }
     public static float distanceTraceLength() {
         initialize();
@@ -107,6 +127,8 @@ public final class RpgCamClient implements ClientModInitializer {
         initialize();
         return Mth.rotLerp(partialTick, visualYawOld, visualYaw);
     }
+    public static float visualHeadYaw() { initialize(); return visualHeadYaw; }
+    public static float visualHeadPitch() { initialize(); return visualHeadPitch; }
     public static void keepBodyFacing(LocalPlayer player) {
         player.yHeadRot = player.getYRot();
         player.yBodyRot = player.getYRot();

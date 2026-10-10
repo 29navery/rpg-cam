@@ -6,13 +6,13 @@ A client-side Fabric mod for Minecraft 26.3 with a third-person swivel camera.
 
 Press **F5** to switch to third-person rear view. Move the mouse to orbit the camera freely. WASD moves relative to the camera, and your character turns toward the movement direction instead of following the mouse. Hold your sprint key to sprint forward, backward, sideways, or diagonally while roaming in rear third-person view. Directional double-tap sprinting also works. Minecraft's normal hunger, crouching, item-use, water, and collision restrictions still apply.
 
-Turning the camera while standing still keeps your character's horizontal facing unchanged. Looking up and down still tilts your character's head.
+Turning the camera while standing still keeps your character's horizontal facing unchanged. In Head Rotation: Camera mode, the head smoothly follows camera yaw and pitch while the body keeps its movement-facing rotation. Directional mode smoothly tilts the head with vertical velocity and keeps its horizontal facing aligned with the body. Head smoothing uses Smoothing Multiplier and is independent of frame rate.
 
 First-person and front-facing third-person use Minecraft's normal controls. The swivel camera also pauses while riding, sleeping, or flying with elytra, and resumes when returning to ordinary movement. Movement retains Minecraft's normal sneak/item-use speed reductions. Sprint-jump momentum follows the movement direction even while the character is still turning.
 
 ## Settings
 
-Install **Mod Menu 21.0.0** for Minecraft 26.3, then open **Mods → RPG Cam → Configure**. Mod Menu is optional; without it, edit `config/rpg-cam.json` while Minecraft is closed.
+Install **Mod Menu 21.0.0** for Minecraft 26.3, then open **Mods → RPG Cam → Configure**. You can also bind **Open RPG Cam Settings** under **Options → Controls → Key Binds → RPG Cam** to open settings directly while playing, even with the mod disabled. It is unbound by default and works without Mod Menu. Mod Menu is optional; without a binding or Mod Menu, edit `config/rpg-cam.json` while Minecraft is closed.
 
 | Setting | Range | Default | Behavior |
 | --- | --- | --- | --- |
@@ -22,7 +22,7 @@ Install **Mod Menu 21.0.0** for Minecraft 26.3, then open **Mods → RPG Cam →
 | Camera Y Offset | 0.0–2.0, step 0.1 | 0.2 | Raises the camera's pivot in world space. |
 | Camera X Offset | −1.0–1.0, step 0.1 | 0.5 | Shifts the camera sideways; positive is right. |
 | Camera Distance | 2.0–15.0, step 0.1 | 4.0 | Requested camera distance in blocks, with smooth distance changes and normal obstruction checks. |
-| Head Rotation | Camera / Directional | Camera | Camera keeps the current up/down head rotation. Directional tilts the head up while rising, down while falling, and forward at rest/on the ground, based on vertical velocity. |
+| Head Rotation | Camera / Directional | Camera | Camera smoothly follows camera yaw and pitch. Directional smoothly tilts the head up while rising, down while falling, and forward at rest/on the ground, based on vertical velocity. |
 
 Toggle states show green ON and red OFF. Head Rotation and Camera Distance each occupy their own bottom settings row. Directional changes only the visible head pitch; body yaw still follows movement and tool/projectile aiming still follows the cursor. Settings save immediately. Camera rotation smoothing is independent of frame rate. Camera distance glides toward its target independently of frame rate, including when an obstruction clears or the distance slider changes. It pulls inward immediately when necessary to prevent clipping through blocks. Camera distance and pivot offsets retain Minecraft's normal visual-shape obstruction checks.
 

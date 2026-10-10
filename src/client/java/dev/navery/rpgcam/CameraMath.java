@@ -6,6 +6,17 @@ public final class CameraMath {
     public static boolean hasMovement(float left, float forward) {
         return left * left + forward * forward > 1.0e-6f;
     }
+    public static float smoothAngle(float current, float wanted, double multiplier, double seconds) {
+        float difference = (wanted - current) % 360;
+        if (difference >= 180) difference -= 360;
+        if (difference < -180) difference += 360;
+        float result = current + difference * (float)frameResponse(multiplier, seconds);
+        // Bound long-running camera orbits while keeping the shortest angular path.
+        result %= 360;
+        if (result >= 180) result -= 360;
+        if (result < -180) result += 360;
+        return result;
+    }
     public static float turnTowards(float current, float wanted, double speed) {
         float difference = (wanted - current) % 360;
         if (difference >= 180) difference -= 360;

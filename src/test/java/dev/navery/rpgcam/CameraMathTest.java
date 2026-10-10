@@ -68,6 +68,17 @@ class CameraMathTest {
         assertEquals(45, CameraMath.directionalHeadPitch(-10, false));
         assertEquals(0, CameraMath.directionalHeadPitch(Double.NaN, false));
     }
+    @Test void headYawSmoothsAcrossWrapAndIsIndependentOfFrameRate() {
+        float across = CameraMath.smoothAngle(179, -179, .1, 1.0 / 60);
+        assertTrue(across > 179 && across < 180);
+        float a = 0, b = 0;
+        for (int i = 0; i < 30; i++) a = CameraMath.smoothAngle(a, 90, .1, 1.0 / 30);
+        for (int i = 0; i < 144; i++) b = CameraMath.smoothAngle(b, 90, .1, 1.0 / 144);
+        assertEquals(a, b, 1e-4);
+        assertTrue(a > 0 && a < 90);
+        assertEquals(90, CameraMath.smoothAngle(0, 90, 1, 1.0 / 60));
+        assertEquals(0, CameraMath.smoothAngle(0, 90, .5, 0));
+    }
     @Test void distanceGlidesBothWaysButNeverClipsThroughAnObstruction() {
         float outward = CameraMath.glideDistance(2, 15, 15, 1.0 / 60);
         assertTrue(outward > 2 && outward < 15);
