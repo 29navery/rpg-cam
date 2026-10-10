@@ -31,6 +31,7 @@ public final class RpgCamOptionsScreen extends OptionsSubScreen {
         list.addBig(OptionInstance.createBoolean("rpg_cam.head_rotation", OptionInstance.noTooltip(),
             (caption, directional) -> Component.translatable(directional ? "rpg_cam.head_directional" : "rpg_cam.head_camera"),
             c.directionalHeadPitch, value -> { c.directionalHeadPitch = value; c.save(); }));
+        list.addBig(toggle("rpg_cam.dither", c.dither, value -> { c.dither = value; c.save(); }));
     }
     private OptionInstance<Boolean> toggle(String key, boolean initial, Consumer<Boolean> setter) {
         return OptionInstance.createBoolean(key, OptionInstance.noTooltip(),

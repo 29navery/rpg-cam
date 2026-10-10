@@ -6,6 +6,8 @@
     "EntityMixin",
     "LocalPlayerMixin",
     "CameraMixin",
+    "SectionCompilerMixin",
+    "RenderPipelinesMixin",
     "LivingEntityMixin",
     "HudMixin",
     "MinecraftMixin",

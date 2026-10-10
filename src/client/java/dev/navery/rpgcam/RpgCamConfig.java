@@ -12,6 +12,7 @@ public final class RpgCamConfig {
     private static final Path FILE = FabricLoader.getInstance().getConfigDir().resolve("rpg-cam.json");
     public boolean enabled = true;
     public boolean directionalHeadPitch = false;
+    public boolean dither = true;
     public double smoothingMultiplier = 0.5;
     public double playerTurnSpeed = 3.5;
     public double cameraYOffset = 0.2;

@@ -1,5 +1,6 @@
 {
   "rpg_cam.enabled": "Mod Enabled",
+  "rpg_cam.dither": "Dither",
   "rpg_cam.head_rotation": "Head Rotation",
   "rpg_cam.head_camera": "Camera",
   "rpg_cam.head_directional": "Directional",

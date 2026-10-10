@@ -20,6 +20,7 @@ public final class RpgCamClient implements ClientModInitializer {
     @Override public void onInitializeClient() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (!active()) reset();
+            CameraDither.update(client);
         });
     }
     public static boolean active() {
