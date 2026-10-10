@@ -12,7 +12,7 @@ public final class RpgCamConfig {
     private static final Path FILE = FabricLoader.getInstance().getConfigDir().resolve("rpg-cam.json");
     public boolean enabled = true;
     public boolean directionalHeadPitch = false;
-    public boolean dither = true;
+    public double cameraDistance = 4.0;
     public double smoothingMultiplier = 0.5;
     public double playerTurnSpeed = 3.5;
     public double cameraYOffset = 0.2;
@@ -28,6 +28,7 @@ public final class RpgCamConfig {
         return new RpgCamConfig();
     }
     public void validate() {
+        cameraDistance = Math.round(clamp(cameraDistance, 2, 15, 4) * 10) / 10.0;
         smoothingMultiplier = clamp(smoothingMultiplier, 0.1, 1, 0.5);
         playerTurnSpeed = clamp(playerTurnSpeed, 0, 10, 3.5);
         cameraYOffset = Math.round(clamp(cameraYOffset, 0, 2, 0.2) * 10) / 10.0;

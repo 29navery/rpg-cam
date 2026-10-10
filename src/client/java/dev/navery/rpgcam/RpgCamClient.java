@@ -12,7 +12,9 @@ public final class RpgCamClient implements ClientModInitializer {
     private static LocalPlayer trackedPlayer;
     private static boolean initialized;
     private static float targetYaw, targetPitch, yaw, pitch, visualYaw, visualYawOld;
-    private static long lastFrame;
+    private static long lastFrame, lastDistanceFrame;
+    private static boolean distanceInitialized;
+    private static float distance;
     private static int aimUntilTick;
     private static int lastAimSendTick = -1;
     private static float lastAimSendYaw, lastAimSendPitch;
@@ -20,7 +22,6 @@ public final class RpgCamClient implements ClientModInitializer {
     @Override public void onInitializeClient() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (!active()) reset();
-            CameraDither.update(client);
         });
     }
     public static boolean active() {
@@ -33,6 +34,7 @@ public final class RpgCamClient implements ClientModInitializer {
         LocalPlayer player = Minecraft.getInstance().player;
         if (!initialized || trackedPlayer != player) {
             trackedPlayer = player;
+            distanceInitialized = false;
             aimUntilTick = 0;
             lastAimSendTick = -1;
             targetYaw = yaw = player.getYRot();
@@ -43,6 +45,7 @@ public final class RpgCamClient implements ClientModInitializer {
         }
     }
     public static void reset() {
+        distanceInitialized = false;
         initialized = false; trackedPlayer = null; aimUntilTick = 0; lastAimSendTick = -1;
     }
     public static void orbit(double dx, double dy) {
@@ -68,6 +71,23 @@ public final class RpgCamClient implements ClientModInitializer {
         float wrapped = Mth.wrapDegrees(yaw);
         targetYaw += wrapped - yaw;
         yaw = wrapped;
+    }
+    public static float distanceTraceLength() {
+        initialize();
+        return (float)Math.max(CONFIG.cameraDistance, distanceInitialized ? distance : 0);
+    }
+    public static float updateDistance(float safeDistance) {
+        initialize();
+        long now = System.nanoTime();
+        if (!distanceInitialized) {
+            distance = (float)Math.min(CONFIG.cameraDistance, safeDistance);
+            distanceInitialized = true;
+        } else {
+            double elapsed = Math.min((now - lastDistanceFrame) / 1_000_000_000.0, 0.1);
+            distance = CameraMath.glideDistance(distance, (float)CONFIG.cameraDistance, safeDistance, elapsed);
+        }
+        lastDistanceFrame = now;
+        return distance;
     }
     public static float yaw() { initialize(); return yaw; }
     public static float pitch() { initialize(); return pitch; }

@@ -1,8 +1,6 @@
 package dev.navery.rpgcam.mixin;
 
 import dev.navery.rpgcam.RpgCamClient;
-import dev.navery.rpgcam.CameraDither;
-import net.minecraft.world.phys.BlockHitResult;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import net.minecraft.client.Camera;
 import net.minecraft.world.entity.Entity;
@@ -24,10 +22,14 @@ public abstract class CameraMixin {
     @Shadow protected abstract void setRotation(float yaw, float pitch);
     @Shadow protected abstract void setPosition(Vec3 position);
 
-    @Redirect(method = "getMaxZoom", at = @At(value = "INVOKE",
-        target = "Lnet/minecraft/world/level/Level;clip(Lnet/minecraft/world/level/ClipContext;)Lnet/minecraft/world/phys/BlockHitResult;"))
-    private BlockHitResult rpgcam$passThroughNonSolid(Level level, ClipContext context) {
-        return level.clip(CameraDither.cameraRay(context.getFrom(), context.getTo(), entity));
+    @Shadow private float getMaxZoom(float distance) { throw new AssertionError(); }
+
+    @Redirect(method = "alignWithEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;getMaxZoom(F)F"))
+    private float rpgcam$glideDistance(Camera camera, float vanillaDistance) {
+        if (!RpgCamClient.active()) return getMaxZoom(vanillaDistance);
+        // Trace far enough to cover both current and requested distances, including slider reductions.
+        float safeDistance = getMaxZoom(RpgCamClient.distanceTraceLength());
+        return RpgCamClient.updateDistance(safeDistance);
     }
 
     // Run before vanilla obstruction testing, so its zoom rays use our orbit direction.
@@ -40,7 +42,7 @@ public abstract class CameraMixin {
         Vec3 offset = new Vec3(-Math.cos(yaw) * RpgCamClient.CONFIG.cameraXOffset,
             RpgCamClient.CONFIG.cameraYOffset, -Math.sin(yaw) * RpgCamClient.CONFIG.cameraXOffset);
         Vec3 end = position.add(offset);
-        HitResult hit = level.clip(CameraDither.cameraRay(position, end, entity));
+        HitResult hit = level.clip(new ClipContext(position, end, ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, entity));
         if (hit.getType() != HitResult.Type.MISS && offset.lengthSqr() > 1.0e-6) {
             double distance = Math.max(0, position.distanceTo(hit.getLocation()) - 0.15);
             end = position.add(offset.normalize().scale(distance));

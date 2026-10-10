@@ -22,6 +22,12 @@ public final class CameraMath {
         // Minecraft pitch is negative when looking up. Scale with velocity and cap the visual tilt.
         return (float)Math.max(-45, Math.min(45, -verticalVelocity * 90));
     }
+    public static float glideDistance(float current, float desired, float safeDistance, double seconds) {
+        float target = Math.min(desired, safeDistance);
+        double response = 1 - Math.exp(-8 * Math.max(0, seconds));
+        // Ease changes in either direction, but never leave the camera behind an obstruction.
+        return Math.max(0, Math.min(safeDistance, current + (float)((target - current) * response)));
+    }
     public static boolean withinReach(double distanceSquared, double min, double max) {
         return distanceSquared >= min * min && distanceSquared <= max * max;
     }

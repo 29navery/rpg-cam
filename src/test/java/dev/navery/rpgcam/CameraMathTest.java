@@ -68,6 +68,19 @@ class CameraMathTest {
         assertEquals(45, CameraMath.directionalHeadPitch(-10, false));
         assertEquals(0, CameraMath.directionalHeadPitch(Double.NaN, false));
     }
+    @Test void distanceGlidesBothWaysButNeverClipsThroughAnObstruction() {
+        float outward = CameraMath.glideDistance(2, 15, 15, 1.0 / 60);
+        assertTrue(outward > 2 && outward < 15);
+        float inward = CameraMath.glideDistance(15, 2, 15, 1.0 / 60);
+        assertTrue(inward > 2 && inward < 15);
+        assertEquals(1, CameraMath.glideDistance(15, 15, 1, 1.0 / 60));
+        assertEquals(0, CameraMath.glideDistance(4, 4, 0, 1.0 / 60));
+        assertEquals(4, CameraMath.glideDistance(4, 4, 15, 1.0 / 60));
+        float at30 = 2, at144 = 2;
+        for (int i = 0; i < 30; i++) at30 = CameraMath.glideDistance(at30, 15, 15, 1.0 / 30);
+        for (int i = 0; i < 144; i++) at144 = CameraMath.glideDistance(at144, 15, 15, 1.0 / 144);
+        assertEquals(at30, at144, 1e-5);
+    }
     @Test void cameraDistanceDoesNotGrantAdditionalInteractionReach() {
         assertTrue(CameraMath.withinReach(4*4,0,4.5));
         assertFalse(CameraMath.withinReach(5*5,0,4.5));
