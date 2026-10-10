@@ -58,6 +58,16 @@ class CameraMathTest {
         assertEquals(-90,CameraMath.lookAt(1,0,0)[0]);
         assertEquals(90,CameraMath.lookAt(-1,0,0)[0]);
     }
+    @Test void directionalHeadFollowsVerticalVelocityAndStaysLevelOnGround() {
+        assertTrue(CameraMath.directionalHeadPitch(.42, false) < 0); // rising: look up
+        assertTrue(CameraMath.directionalHeadPitch(-.42, false) > 0); // falling: look down
+        assertEquals(0, CameraMath.directionalHeadPitch(0, false));
+        assertEquals(0, CameraMath.directionalHeadPitch(.005, false));
+        assertEquals(0, CameraMath.directionalHeadPitch(-.0784, true)); // grounded gravity
+        assertEquals(-45, CameraMath.directionalHeadPitch(10, false));
+        assertEquals(45, CameraMath.directionalHeadPitch(-10, false));
+        assertEquals(0, CameraMath.directionalHeadPitch(Double.NaN, false));
+    }
     @Test void cameraDistanceDoesNotGrantAdditionalInteractionReach() {
         assertTrue(CameraMath.withinReach(4*4,0,4.5));
         assertFalse(CameraMath.withinReach(5*5,0,4.5));

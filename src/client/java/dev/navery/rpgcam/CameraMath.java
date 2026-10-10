@@ -16,6 +16,12 @@ public final class CameraMath {
         return new float[] {(float)Math.toDegrees(Math.atan2(-x, z)),
             (float)-Math.toDegrees(Math.atan2(y, Math.hypot(x, z)))};
     }
+    public static float directionalHeadPitch(double verticalVelocity, boolean grounded) {
+        // Grounded entities can retain a small downward gravity velocity: keep the head level there.
+        if (grounded || !Double.isFinite(verticalVelocity) || Math.abs(verticalVelocity) < 0.01) return 0;
+        // Minecraft pitch is negative when looking up. Scale with velocity and cap the visual tilt.
+        return (float)Math.max(-45, Math.min(45, -verticalVelocity * 90));
+    }
     public static boolean withinReach(double distanceSquared, double min, double max) {
         return distanceSquared >= min * min && distanceSquared <= max * max;
     }

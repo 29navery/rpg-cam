@@ -1,6 +1,8 @@
 {
   "rpg_cam.enabled": "Mod Enabled",
-  "rpg_cam.direction": "Direction",
+  "rpg_cam.head_rotation": "Head Rotation",
+  "rpg_cam.head_camera": "Camera",
+  "rpg_cam.head_directional": "Directional",
   "rpg_cam.smoothing": "Smoothing Multiplier",
   "rpg_cam.turn_speed": "Player Turn Speed",
   "rpg_cam.y_offset": "Camera Y Offset",

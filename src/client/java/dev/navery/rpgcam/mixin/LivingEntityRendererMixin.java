@@ -1,6 +1,7 @@
 package dev.navery.rpgcam.mixin;
 
 import dev.navery.rpgcam.RpgCamClient;
+import dev.navery.rpgcam.CameraMath;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
@@ -19,6 +20,10 @@ public abstract class LivingEntityRendererMixin {
             // Render turning independently of the exact rotation used for vanilla actions and packets.
             state.bodyRot = RpgCamClient.visualYaw(partialTick);
             state.yRot = 0;
+            if (RpgCamClient.CONFIG.directionalHeadPitch) {
+                // Change only the rendered head pitch; camera and tool/projectile aim remain independent.
+                state.xRot = CameraMath.directionalHeadPitch(entity.getDeltaMovement().y, entity.onGround());
+            }
         }
     }
 }

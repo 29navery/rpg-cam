@@ -101,12 +101,12 @@ public final class RpgCamClient implements ClientModInitializer {
             wanted = player.getYRot();
         } else {
             player.setXRot(targetPitch);
-            wanted = CONFIG.direction ? yaw() : moving ? movementYaw(left, forward) : player.getYRot();
+            wanted = moving ? movementYaw(left, forward) : player.getYRot();
         }
         // Advance the visible body/head exactly once per simulation tick. Action hooks only set the aim.
         visualYawOld = visualYaw;
         visualYaw = CameraMath.turnTowards(visualYaw, wanted, CONFIG.playerTurnSpeed);
-        if (!aiming && (moving || CONFIG.direction)) player.setYRot(visualYaw);
+        if (!aiming && moving) player.setYRot(visualYaw);
         keepBodyFacing(player);
         if (!moving) return;
         // Compensate for body turn lag so movement always uses the camera's basis.

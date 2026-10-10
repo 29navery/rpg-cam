@@ -28,9 +28,9 @@ public final class RpgCamOptionsScreen extends OptionsSubScreen {
         list.addSmall(
             slider("rpg_cam.x_offset", -10, 10, (int)Math.round(c.cameraXOffset * 10), value -> c.cameraXOffset = value / 10.0),
             slider("rpg_cam.y_offset", 0, 20, (int)Math.round(c.cameraYOffset * 10), value -> c.cameraYOffset = value / 10.0));
-        list.addBig(toggle("rpg_cam.direction", c.direction, value -> {
-            c.direction = value; c.save();
-        }));
+        list.addBig(OptionInstance.createBoolean("rpg_cam.head_rotation", OptionInstance.noTooltip(),
+            (caption, directional) -> Component.translatable(directional ? "rpg_cam.head_directional" : "rpg_cam.head_camera"),
+            c.directionalHeadPitch, value -> { c.directionalHeadPitch = value; c.save(); }));
     }
     private OptionInstance<Boolean> toggle(String key, boolean initial, Consumer<Boolean> setter) {
         return OptionInstance.createBoolean(key, OptionInstance.noTooltip(),
