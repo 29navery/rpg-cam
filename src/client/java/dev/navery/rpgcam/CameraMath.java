@@ -17,16 +17,22 @@ public final class CameraMath {
         }
         return Math.max(-75, Math.min(75, angle));
     }
-    public static float smoothHeadYaw(float current, float target, double multiplier, double seconds) {
+    public record HeadMotion(float yaw, float velocity) {}
+    public static HeadMotion springHeadYaw(float current, float velocity, float target, double multiplier, double seconds) {
         current = Math.max(-75, Math.min(75, current));
         target = Math.max(-75, Math.min(75, target));
         double elapsed = Math.max(0, seconds);
-        float change = (target - current) * (float)frameResponse(multiplier, elapsed);
-        // Head offsets are linear within the neck's range. Never wrap from one limit to the other.
-        // Keep a slew limit even at smoothing=1 so crossing behind the body cannot cause a snap.
-        float maxChange = (float)(180 * elapsed);
-        change = Math.max(-maxChange, Math.min(maxChange, change));
-        return Math.max(-75, Math.min(75, current + change));
+        double omega = 4 + 8 * multiplier;
+        double displacement = current - target;
+        double spring = velocity + omega * displacement;
+        double decay = Math.exp(-omega * elapsed);
+        double next = target + (displacement + spring * elapsed) * decay;
+        double nextVelocity = (velocity - omega * spring * elapsed) * decay;
+        // Exact critically damped spring: accelerate into a turn, then ease to rest without a linear cap.
+        // Clamp physical neck limits and remove momentum pushing into either limit.
+        if (next >= 75) { next = 75; if (nextVelocity > 0) nextVelocity = 0; }
+        if (next <= -75) { next = -75; if (nextVelocity < 0) nextVelocity = 0; }
+        return new HeadMotion((float)next, (float)nextVelocity);
     }
     public static float smoothAngle(float current, float wanted, double multiplier, double seconds) {
         float difference = (wanted - current) % 360;

@@ -16,7 +16,7 @@ public final class RpgCamClient implements ClientModInitializer {
     private static LocalPlayer trackedPlayer;
     private static boolean initialized;
     private static float targetYaw, targetPitch, yaw, pitch, visualYaw, visualYawOld;
-    private static float visualHeadYawOffset, visualHeadPitch;
+    private static float visualHeadYawOffset, visualHeadYawVelocity, visualHeadPitch;
     private static KeyMapping openSettings;
     private static long lastFrame, lastDistanceFrame;
     private static boolean distanceInitialized;
@@ -53,6 +53,7 @@ public final class RpgCamClient implements ClientModInitializer {
             visualYaw = visualYawOld = player.yBodyRot;
             targetPitch = pitch = player.getXRot();
             visualHeadYawOffset = Mth.clamp(Mth.wrapDegrees(player.yHeadRot - player.yBodyRot), -75, 75);
+            visualHeadYawVelocity = 0;
             visualHeadPitch = player.getXRot();
             lastFrame = System.nanoTime();
             initialized = true;
@@ -90,7 +91,10 @@ public final class RpgCamClient implements ClientModInitializer {
             : CameraMath.headYawTarget(yaw - visualYaw(partialTick), CONFIG.realisticHeadMovement);
         float headPitchTarget = CONFIG.directionalHeadPitch
             ? CameraMath.directionalHeadPitch(trackedPlayer.getDeltaMovement().y, trackedPlayer.onGround()) : pitch;
-        visualHeadYawOffset = CameraMath.smoothHeadYaw(visualHeadYawOffset, headYawTarget, CONFIG.smoothingMultiplier, elapsed);
+        CameraMath.HeadMotion head = CameraMath.springHeadYaw(visualHeadYawOffset, visualHeadYawVelocity,
+            headYawTarget, CONFIG.smoothingMultiplier, elapsed);
+        visualHeadYawOffset = head.yaw();
+        visualHeadYawVelocity = head.velocity();
         visualHeadPitch += (float)((headPitchTarget - visualHeadPitch) * alpha);
     }
     public static float distanceTraceLength() {

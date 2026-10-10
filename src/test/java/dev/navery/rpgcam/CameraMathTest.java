@@ -68,20 +68,40 @@ class CameraMathTest {
         assertEquals(45, CameraMath.directionalHeadPitch(-10, false));
         assertEquals(0, CameraMath.directionalHeadPitch(Double.NaN, false));
     }
-    @Test void realisticHeadIsLimitedAndCrossesBehindWithoutSnappingEvenAtFullResponse() {
+    @Test void realisticHeadSpringAcceleratesThenEasesWithoutSnappingOrExceedingLimits() {
         assertEquals(75, CameraMath.headYawTarget(120, true));
         assertEquals(-75, CameraMath.headYawTarget(-120, true));
-        float head = 75;
+        var motion = new CameraMath.HeadMotion(75, 0);
         float target = CameraMath.headYawTarget(-179, true);
-        float next = CameraMath.smoothHeadYaw(head, target, 1, 1.0 / 60);
-        assertEquals(72, next, 1e-5);
+        float firstChange = 0, peakChange = 0, finalChange = 0;
         for (int i = 0; i < 120; i++) {
-            float previous = head;
-            head = CameraMath.smoothHeadYaw(head, target, .5, 1.0 / 60);
-            assertTrue(Math.abs(head - previous) <= 3.00001);
-            assertTrue(head >= -75 && head <= 75);
+            float previous = motion.yaw();
+            motion = CameraMath.springHeadYaw(motion.yaw(), motion.velocity(), target, .5, 1.0 / 60);
+            float change = Math.abs(motion.yaw() - previous);
+            if (i == 0) firstChange = change;
+            peakChange = Math.max(peakChange, change);
+            finalChange = change;
+            assertTrue(motion.yaw() >= -75 && motion.yaw() <= 75);
+            assertTrue(motion.yaw() >= target);
         }
-        assertEquals(-75, head, 1e-4);
+        assertTrue(firstChange > 0 && firstChange < peakChange);
+        assertTrue(finalChange < firstChange);
+        assertEquals(-75, motion.yaw(), .001);
+        var fullResponse = CameraMath.springHeadYaw(75, 0, -75, 1, 1.0 / 60);
+        assertTrue(fullResponse.yaw() > 70 && fullResponse.yaw() < 75);
+    }
+    @Test void headSpringPreservesFrameRateIndependenceAndLimitsOnReversal() {
+        var at30 = new CameraMath.HeadMotion(0, 0);
+        var at144 = new CameraMath.HeadMotion(0, 0);
+        for (int i = 0; i < 30; i++) at30 = CameraMath.springHeadYaw(at30.yaw(), at30.velocity(), 75, .5, 1.0 / 30);
+        for (int i = 0; i < 144; i++) at144 = CameraMath.springHeadYaw(at144.yaw(), at144.velocity(), 75, .5, 1.0 / 144);
+        assertEquals(at30.yaw(), at144.yaw(), 1e-4);
+        assertEquals(at30.velocity(), at144.velocity(), 1e-4);
+        var motion = new CameraMath.HeadMotion(74, 400);
+        for (int i = 0; i < 120; i++) {
+            motion = CameraMath.springHeadYaw(motion.yaw(), motion.velocity(), i < 60 ? -75 : 75, .5, 1.0 / 60);
+            assertTrue(motion.yaw() >= -75 && motion.yaw() <= 75);
+        }
     }
     @Test void foldedHeadYawReturnsToForwardBehindTheBodyAndPreservesSides() {
         assertEquals(0, CameraMath.headYawTarget(180, false));
