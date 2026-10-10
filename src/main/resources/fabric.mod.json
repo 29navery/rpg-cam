@@ -3,6 +3,7 @@
   "id": "rpg_cam",
   "version": "${version}",
   "name": "RPG Cam",
+  "icon": "assets/rpg_cam/icon.png",
   "description": "A smooth third-person swivel camera with camera-relative movement.",
   "authors": [
     "Nicky_lul"
