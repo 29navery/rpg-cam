@@ -42,4 +42,4 @@ The mod jar is written to `build/libs/`. GitHub Actions builds pushes and pull r
 
 ## License
 
-CC0-1.0.
+[Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)](https://creativecommons.org/licenses/by-nc/4.0/).
