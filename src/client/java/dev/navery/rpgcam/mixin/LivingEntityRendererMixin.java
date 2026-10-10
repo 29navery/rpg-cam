@@ -1,7 +1,6 @@
 package dev.navery.rpgcam.mixin;
 
 import dev.navery.rpgcam.RpgCamClient;
-import net.minecraft.util.Mth;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
@@ -21,7 +20,7 @@ public abstract class LivingEntityRendererMixin {
             state.bodyRot = RpgCamClient.visualYaw(partialTick);
             // yRot is the head's yaw relative to its body, not an absolute world angle.
             state.yRot = RpgCamClient.CONFIG.directionalHeadPitch ? 0
-                : Mth.wrapDegrees(RpgCamClient.visualHeadYaw() - state.bodyRot);
+                : RpgCamClient.visualHeadYawOffset();
             state.xRot = RpgCamClient.visualHeadPitch();
         }
     }

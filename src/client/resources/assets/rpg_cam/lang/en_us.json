@@ -4,6 +4,7 @@
   "key.category.rpg_cam.settings": "RPG Cam",
   "rpg_cam.distance": "Camera Distance",
   "rpg_cam.head_rotation": "Head Rotation",
+  "rpg_cam.realistic_head": "Realistic Head",
   "rpg_cam.head_camera": "Camera",
   "rpg_cam.head_directional": "Directional",
   "rpg_cam.smoothing": "Smoothing Multiplier",

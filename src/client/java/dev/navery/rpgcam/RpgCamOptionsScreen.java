@@ -28,9 +28,10 @@ public final class RpgCamOptionsScreen extends OptionsSubScreen {
         list.addSmall(
             slider("rpg_cam.x_offset", -10, 10, (int)Math.round(c.cameraXOffset * 10), value -> c.cameraXOffset = value / 10.0),
             slider("rpg_cam.y_offset", 0, 20, (int)Math.round(c.cameraYOffset * 10), value -> c.cameraYOffset = value / 10.0));
-        list.addBig(OptionInstance.createBoolean("rpg_cam.head_rotation", OptionInstance.noTooltip(),
+        list.addSmall(OptionInstance.createBoolean("rpg_cam.head_rotation", OptionInstance.noTooltip(),
             (caption, directional) -> Component.translatable(directional ? "rpg_cam.head_directional" : "rpg_cam.head_camera"),
-            c.directionalHeadPitch, value -> { c.directionalHeadPitch = value; c.save(); }));
+            c.directionalHeadPitch, value -> { c.directionalHeadPitch = value; c.save(); }),
+            toggle("rpg_cam.realistic_head", c.realisticHeadMovement, value -> { c.realisticHeadMovement = value; c.save(); }));
         list.addBig(slider("rpg_cam.distance", 20, 150, (int)Math.round(c.cameraDistance * 10),
             value -> c.cameraDistance = value / 10.0));
     }

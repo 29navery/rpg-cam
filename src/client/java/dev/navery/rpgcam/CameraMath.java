@@ -6,6 +6,28 @@ public final class CameraMath {
     public static boolean hasMovement(float left, float forward) {
         return left * left + forward * forward > 1.0e-6f;
     }
+    public static float headYawTarget(float cameraRelativeYaw, boolean realistic) {
+        float angle = cameraRelativeYaw % 360;
+        if (angle >= 180) angle -= 360;
+        if (angle < -180) angle += 360;
+        if (!realistic) {
+            // Fold the rear hemisphere toward forward: +/-180 becomes 0, while retaining left/right.
+            if (angle > 90) angle = 180 - angle;
+            if (angle < -90) angle = -180 - angle;
+        }
+        return Math.max(-75, Math.min(75, angle));
+    }
+    public static float smoothHeadYaw(float current, float target, double multiplier, double seconds) {
+        current = Math.max(-75, Math.min(75, current));
+        target = Math.max(-75, Math.min(75, target));
+        double elapsed = Math.max(0, seconds);
+        float change = (target - current) * (float)frameResponse(multiplier, elapsed);
+        // Head offsets are linear within the neck's range. Never wrap from one limit to the other.
+        // Keep a slew limit even at smoothing=1 so crossing behind the body cannot cause a snap.
+        float maxChange = (float)(180 * elapsed);
+        change = Math.max(-maxChange, Math.min(maxChange, change));
+        return Math.max(-75, Math.min(75, current + change));
+    }
     public static float smoothAngle(float current, float wanted, double multiplier, double seconds) {
         float difference = (wanted - current) % 360;
         if (difference >= 180) difference -= 360;

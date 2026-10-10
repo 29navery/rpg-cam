@@ -36,7 +36,7 @@ public abstract class CameraMixin {
     @Inject(method = "alignWithEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;getMaxZoom(F)F"))
     private void rpgcam$camera(float partialTick, CallbackInfo ci) {
         if (!RpgCamClient.active()) return;
-        RpgCamClient.updateCamera();
+        RpgCamClient.updateCamera(partialTick);
         setRotation(RpgCamClient.yaw(), RpgCamClient.pitch());
         double yaw = Math.toRadians(RpgCamClient.yaw());
         Vec3 offset = new Vec3(-Math.cos(yaw) * RpgCamClient.CONFIG.cameraXOffset,

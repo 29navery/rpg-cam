@@ -68,6 +68,34 @@ class CameraMathTest {
         assertEquals(45, CameraMath.directionalHeadPitch(-10, false));
         assertEquals(0, CameraMath.directionalHeadPitch(Double.NaN, false));
     }
+    @Test void realisticHeadIsLimitedAndCrossesBehindWithoutSnappingEvenAtFullResponse() {
+        assertEquals(75, CameraMath.headYawTarget(120, true));
+        assertEquals(-75, CameraMath.headYawTarget(-120, true));
+        float head = 75;
+        float target = CameraMath.headYawTarget(-179, true);
+        float next = CameraMath.smoothHeadYaw(head, target, 1, 1.0 / 60);
+        assertEquals(72, next, 1e-5);
+        for (int i = 0; i < 120; i++) {
+            float previous = head;
+            head = CameraMath.smoothHeadYaw(head, target, .5, 1.0 / 60);
+            assertTrue(Math.abs(head - previous) <= 3.00001);
+            assertTrue(head >= -75 && head <= 75);
+        }
+        assertEquals(-75, head, 1e-4);
+    }
+    @Test void foldedHeadYawReturnsToForwardBehindTheBodyAndPreservesSides() {
+        assertEquals(0, CameraMath.headYawTarget(180, false));
+        assertEquals(0, CameraMath.headYawTarget(-180, false));
+        assertEquals(45, CameraMath.headYawTarget(135, false));
+        assertEquals(-45, CameraMath.headYawTarget(-135, false));
+        assertEquals(75, CameraMath.headYawTarget(90, false));
+        assertEquals(-75, CameraMath.headYawTarget(-90, false));
+        for (int yaw = -720; yaw <= 720; yaw++) {
+            float target = CameraMath.headYawTarget(yaw, false);
+            assertTrue(target >= -75 && target <= 75);
+            if (yaw < 720) assertTrue(Math.abs(target - CameraMath.headYawTarget(yaw + 1, false)) <= 1.00001);
+        }
+    }
     @Test void headYawSmoothsAcrossWrapAndIsIndependentOfFrameRate() {
         float across = CameraMath.smoothAngle(179, -179, .1, 1.0 / 60);
         assertTrue(across > 179 && across < 180);
