@@ -132,7 +132,7 @@ class CameraMathTest {
         assertEquals(2.2f, CameraMath.sleepDistanceTarget(2.3f), 1e-6);
         assertEquals(0, CameraMath.sleepDistanceTarget(.05f));
         float target = CameraMath.sleepDistanceTarget(2.3f), distance = .15f;
-        for (int i = 0; i < 120; i++) {
+        for (int i = 0; i < 180; i++) {
             float previous = distance;
             distance = CameraMath.glideDistance(distance, target, target, 1.0 / 60);
             assertTrue(distance >= previous && distance <= target);

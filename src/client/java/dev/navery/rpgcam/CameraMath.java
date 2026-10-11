@@ -67,7 +67,9 @@ public final class CameraMath {
     }
     public static float glideDistance(float current, float desired, float safeDistance, double seconds) {
         float target = Math.min(desired, safeDistance);
-        double response = 1 - Math.exp(-8 * Math.max(0, seconds));
+        // Give outward zoom a little more time; keep inward adjustments responsive.
+        double rate = target > current ? 6 : 8;
+        double response = 1 - Math.exp(-rate * Math.max(0, seconds));
         // Ease changes in either direction, but never leave the camera behind an obstruction.
         return Math.max(0, Math.min(safeDistance, current + (float)((target - current) * response)));
     }
