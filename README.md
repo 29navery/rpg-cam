@@ -20,6 +20,10 @@ Open **Mods → RPG Cam → Configure** with Mod Menu installed. You can also as
 
 The settings let you enable or disable the mod and adjust camera smoothing, character turn speed, camera offsets, distance, and head movement. For head rotation, **Realistic** keeps trying to look toward the camera, while **Folded** brings the head back toward forward when the camera moves behind the character.
 
+## Optional held torches
+
+Enable **RPG Cam: Held Torches** in **Options → Resource Packs** for 3D held torches and a forward-reaching torch arm. It supports regular, soul, redstone, and copper torches in either hand. Inventory icons stay the same. The pack is included with the mod and starts disabled.
+
 ## Installation
 
 Requires **Java 25**, **Fabric Loader 0.19.5 or newer**, and **Fabric API** for Minecraft 26.3. Mod Menu is optional.

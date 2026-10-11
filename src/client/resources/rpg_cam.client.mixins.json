@@ -10,7 +10,8 @@
     "HudMixin",
     "MinecraftMixin",
     "GameModeMixin",
-    "LivingEntityRendererMixin"
+    "LivingEntityRendererMixin",
+    "TorchArmMixin"
   ],
   "injectors": {
     "defaultRequire": 1

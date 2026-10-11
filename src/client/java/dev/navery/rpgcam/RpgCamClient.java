@@ -26,6 +26,11 @@ public final class RpgCamClient implements ClientModInitializer {
     private static float lastAimSendYaw, lastAimSendPitch;
 
     @Override public void onInitializeClient() {
+        net.fabricmc.fabric.api.resource.v1.ResourceLoader.registerBuiltinPack(
+            Identifier.fromNamespaceAndPath("rpg_cam", "held_torches"),
+            net.fabricmc.loader.api.FabricLoader.getInstance().getModContainer("rpg_cam").orElseThrow(),
+            net.minecraft.network.chat.Component.literal("RPG Cam: Held Torches"),
+            net.fabricmc.fabric.api.resource.v1.pack.PackActivationType.NORMAL);
         KeyMapping.Category category = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("rpg_cam", "settings"));
         openSettings = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.rpg_cam.open_settings",
             InputConstants.Type.KEYBOARD, InputConstants.UNKNOWN.getValue(), category));
