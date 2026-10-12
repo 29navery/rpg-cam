@@ -142,6 +142,14 @@ public final class RpgCamClient implements ClientModInitializer {
     }
     public static float visualHeadYawOffset() { initialize(); return visualHeadYawOffset; }
     public static float visualHeadPitch() { initialize(); return visualHeadPitch; }
+    public static float networkYaw(LocalPlayer player) {
+        // Vanilla servers broadcast player yaw as head yaw. Keep this separate from
+        // local movement rotation and yield to exact cursor rotation during actions.
+        if (!active()) return player.getYRot();
+        initialize();
+        return CameraMath.networkYaw(player.getYRot(), visualYaw, visualHeadYawOffset,
+            !aiming() && !CONFIG.directionalHeadPitch);
+    }
     public static void keepBodyFacing(LocalPlayer player) {
         player.yHeadRot = player.getYRot();
         player.yBodyRot = player.getYRot();

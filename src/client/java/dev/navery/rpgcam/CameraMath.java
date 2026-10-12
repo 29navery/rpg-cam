@@ -6,6 +6,13 @@ public final class CameraMath {
     public static boolean hasMovement(float left, float forward) {
         return left * left + forward * forward > 1.0e-6f;
     }
+    public static float networkYaw(float actionYaw, float bodyYaw, float headOffset, boolean freeLook) {
+        if (!freeLook) return actionYaw;
+        float angle = (bodyYaw + Math.max(-75, Math.min(75, headOffset))) % 360;
+        if (angle >= 180) angle -= 360;
+        if (angle < -180) angle += 360;
+        return angle;
+    }
     public static float headYawTarget(float cameraRelativeYaw, boolean realistic) {
         float angle = cameraRelativeYaw % 360;
         if (angle >= 180) angle -= 360;

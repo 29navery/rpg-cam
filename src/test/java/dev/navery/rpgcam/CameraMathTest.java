@@ -3,6 +3,18 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CameraMathTest {
+    @Test void networkRotationUsesDisplayedHeadDuringFreeLook() {
+        assertEquals(65, CameraMath.networkYaw(20, 20, 45, true));
+        assertEquals(-25, CameraMath.networkYaw(20, 20, -45, true));
+        assertEquals(-150, CameraMath.networkYaw(170, 170, 40, true));
+        assertEquals(150, CameraMath.networkYaw(-170, -170, -40, true));
+        assertEquals(75, CameraMath.networkYaw(0, 0, 100, true));
+    }
+    @Test void networkRotationPreservesExactActionAimAndVanillaFacing() {
+        // Aiming, directional mode, and inactive views must send actual yaw.
+        assertEquals(123.5f, CameraMath.networkYaw(123.5f, 20, 45, false));
+        assertEquals(-179, CameraMath.networkYaw(-179, 90, -75, false));
+    }
     @Test void movementFollowsCameraRegardlessOfBodyFacing() {
         float[][] inputs = {{0,1}, {0,-1}, {1,0}, {-1,0}, {.70710677f,.70710677f}};
         for (int camera = -180; camera <= 180; camera += 30) {

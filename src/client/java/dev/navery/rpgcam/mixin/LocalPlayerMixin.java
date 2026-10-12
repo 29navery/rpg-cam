@@ -16,6 +16,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LocalPlayer.class)
 public abstract class LocalPlayerMixin {
+    @Redirect(method = "sendPosition", at = @At(value = "INVOKE",
+        target = "Lnet/minecraft/client/player/LocalPlayer;getYRot()F"))
+    private float rpgcam$sendVisibleHeadYaw(LocalPlayer player) {
+        return RpgCamClient.networkYaw(player);
+    }
     @Inject(method = "applyInput", at = @At("RETURN"))
     private void rpgcam$movement(CallbackInfo ci) {
         if (RpgCamClient.active()) RpgCamClient.applyMovement((LocalPlayer)(Object)this);
